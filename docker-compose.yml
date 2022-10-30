@@ -1,0 +1,75 @@
+version: '3.7'
+
+services:
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=true
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    restart: always
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_NUM_PARTITIONS=2
+    depends_on:
+      - zookeeper
+  
+  producer:
+    build: producer
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - KAFKA_HOST=kafka:9092
+      - PORT=3000
+      - KAFKAJS_NO_PARTITIONER_WARNING=1
+    depends_on:
+      - kafka
+
+  consumer_miembros:
+    build: consumer_miembros
+    restart: always
+    volumes:
+      - ./log/miembros.log:/app/.log
+    environment:
+      - KAFKA_HOST=kafka:9092
+    depends_on:
+      - producer
+    
+  consumer_stock:
+    build: consumer_stock
+    restart: always
+    volumes:
+      - ./log/stock.log:/app/.log
+    environment:
+      - KAFKA_HOST=kafka:9092
+    depends_on:
+      - producer
+      
+  consumer_ubicacion:
+    build: consumer_ubicacion
+    restart: always
+    volumes:
+      - ./log/ubicacion.log:/app/.log
+    environment:
+      - KAFKA_HOST=kafka:9092
+    depends_on:
+      - producer
+  
+  consumer_ventas:
+    build: consumer_ventas
+    restart: always
+    volumes:
+      - ./log/ventas.log/:/app/.log
+    environment:
+      - KAFKA_HOST=kafka:9092
+    depends_on:
+      - producer
