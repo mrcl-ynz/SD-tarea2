@@ -25,7 +25,7 @@ const service = async () => {
             entries.forEach(async (x) => {
                 let data = JSON.parse(x.value.toString());
                 
-                if (data.stock > 20) return;
+                if (data.stock >= 20) return;
 
                 let msg = `El carrito ${data.patente} tiene ${data.stock} sopaipillas restantes!`
 

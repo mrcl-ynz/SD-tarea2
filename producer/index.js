@@ -30,44 +30,36 @@ app.post('/registro', async (req, res) => {
 app.post('/venta', async(req, res) => {
     await producer.connect();
 
-    await producer.sendBatch({
-        topicMessages: [
-            {
-                topic: 'ventas',
-                messages: [
-                    {   
-                        value: JSON.stringify({
-                            patente: req.body.patente,
-                            cantidad: req.body.cantidad,
-                        })
-                    }
-                ]
-            },
-            {
-                topic: 'stock',
-                messages: [
-                    {
-                        value: JSON.stringify({
-                            patente: req.body.patente,
-                            stock: req.body.stock,
-                        })
-                    }
-                ]
-            },
-            { 
-                topic: 'ubicacion',
-                messages: [
-                    {
-                        partition: 0,
-                        value: JSON.stringify({
-                            patente: req.body.patente,
-                            coord: req.body.coord,
-                        })
-                    }
-                ]
-            }
-        ],
-    });
+    await producer.sendBatch({ topicMessages: [
+        {
+            topic: 'ventas',
+            messages: [{   
+                value: JSON.stringify({
+                    patente: req.body.patente,
+                    cantidad: req.body.cantidad,
+                })
+            }]
+        },
+        {
+            topic: 'stock',
+            messages: [{
+                value: JSON.stringify({
+                    patente: req.body.patente,
+                    stock: req.body.stock,
+                })
+            }]
+        },
+        { 
+            topic: 'ubicacion',
+            messages: [{
+                partition: 0,
+                value: JSON.stringify({
+                    patente: req.body.patente,
+                    coord: req.body.coord,
+                })
+            }]
+        }
+    ]});
 
     await producer.disconnect();
 
